@@ -17,16 +17,16 @@ namespace Log {
   template<typename... Args>
   void info(const char* format, Args... args) {
     sprintf(log_buffer, format, args...);
-    printf("[INFO]: %s\n", log_buffer);
+    printf("[\x1b[34mINFO\x1b[0m]: %s\n", log_buffer);
   }
   template<typename... Args>
   void warn(const char* format, Args... args) {
     sprintf(log_buffer, format, args...);
-    printf("[WARN]: %s\n", log_buffer);
+    printf("[\x1b[33mWARN\x1b[0m]: %s\n", log_buffer);
   }
   template<typename... Args>
   void err(const char* format, Args... args) {
     sprintf(log_buffer, format, args...);
-    printf("[ERROR]: %s\n", log_buffer);
+    printf("[\x1b[31mERROR\x1b[0m]: %s\n", log_buffer);
   }
 }
