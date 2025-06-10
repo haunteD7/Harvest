@@ -2,11 +2,24 @@
 
 // ================ DEFINES ================
 
+#define INIT_LOGGING
+
 #define LOG_INFO(...) Log::info(__VA_ARGS__)
 #define LOG_WARN(...) Log::warn(__VA_ARGS__)
 #define LOG_ERR(...) Log::err(__VA_ARGS__)
 
+#ifdef INIT_LOGGING
+
+#define LOG_INIT() LOG_INFO(__PRETTY_FUNCTION__)
+
+#else
+
+#define LOG_INIT() 
+
+#endif // INIT_LOGGING
+
 // ============= LOG FUNCTIONS =============
+
 #include <cstdio>
 
 #define MAX_LOG_LENGTH 8196
