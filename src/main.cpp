@@ -2,6 +2,5 @@
 
 int main (int argc, char *argv[]) {
   Application app;
-  app.start();
-  return 0;
+  return app.start();
 }
