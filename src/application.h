@@ -1,6 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include "window.h"
+#include "types.h"
 
 class Application {
 public:
@@ -12,5 +15,5 @@ private:
   bool init();
   bool on_update();
 
-  Window window;
+  std::unique_ptr<Window> _window;
 };
