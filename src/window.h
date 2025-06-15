@@ -21,7 +21,7 @@ public:
   static void system_stop();
   static bool is_system_initialized() { return _is_system_initialized; }
 
-  bool create(u32 width, u32 height, std::string title);
+  bool create(const u32 width, const u32 height, const std::string& title);
   bool is_created() const { return _is_created; }
   bool is_open() const { return _is_open; }
   bool open(bool fullscreen = false);
@@ -29,8 +29,10 @@ public:
   void swap_buffers();
 
   void poll_events();
-  void add_event_listener(WindowEventType event, EventCallback callback);
+  void add_event_listener(WindowEventType event_type, EventCallback callback);
 private:
+  void handle_event(WindowEventType event_type, const WindowEvent& event);
+
   static bool _is_system_initialized;
 
   std::array<EventCallback, WindowEventType::Count> _event_callbacks;

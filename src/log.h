@@ -3,6 +3,7 @@
 // ================ DEFINES ================
 
 #define INIT_LOGGING // Enables logging constructors and init functions stuff
+#define EVENTS_LOGGING
 
 #define LOG_INFO(...) Log::info(__VA_ARGS__)
 #define LOG_WARN(...) Log::warn(__VA_ARGS__)
@@ -13,6 +14,12 @@
 #else
 #define LOG_INIT() 
 #endif // INIT_LOGGING
+
+#ifdef EVENTS_LOGGING
+#define LOG_EVENT(...) LOG_INFO(__VA_ARGS__)
+#else
+#define LOG_EVENT(...) 
+#endif // EVENTS_LOGGING
 
 // ============= LOG FUNCTIONS =============
 

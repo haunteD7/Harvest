@@ -33,7 +33,7 @@ bool Window::system_start() {
 void Window::system_stop() {
   glfwTerminate();  
 }
-bool Window::create(unsigned int width, unsigned int height, std::string title) {
+bool Window::create(const u32 width, const u32 height, const std::string& title) {
   if(!is_system_initialized()) {
     LOG_ERR("Window system not initialized");
     return false;
@@ -54,11 +54,26 @@ bool Window::create(unsigned int width, unsigned int height, std::string title) 
   // ================= CALLBACKS ===================  
   glfwSetWindowCloseCallback(_window, [](GLFWwindow* window){
     Window* this_window = (Window*)glfwGetWindowUserPointer(window);
+    WindowCloseEvent event;
+    LOG_EVENT("%s", event.get_event_string().c_str());
 
-    WindowCloseEvent e;
-
-    if(this_window->_event_callbacks[WindowEventType::Close]) this_window->_event_callbacks[WindowEventType::Close](e);
+    this_window->handle_event(Close, event);
   });
+  glfwSetWindowSizeCallback(_window, [](GLFWwindow* window, int x, int y){
+    Window* this_window = (Window*)glfwGetWindowUserPointer(window);
+    WindowResizeEvent event(x, y);
+    LOG_EVENT("%s: { %d; %d }", event.get_event_string().c_str(), event.get_x(), event.get_y());
+
+    this_window->handle_event(Resize, event);
+  });
+  glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods){
+    Window* this_window = (Window*)glfwGetWindowUserPointer(window);
+    WindowKeyboardEvent event((KeyCodes)key, (KeyAction)action, (KeyModifiers)mods);
+    LOG_EVENT("%s: %s", event.get_event_string().c_str(), event.get_key_name());
+
+    this_window->handle_event(Keyboard, event);
+  });
+
   // ===============================================  
 
   _is_created = true;
@@ -83,8 +98,11 @@ bool Window::close() {
 void Window::poll_events() {
   glfwPollEvents();
 }
-void Window::add_event_listener(WindowEventType event, EventCallback callback) {
-  _event_callbacks[event] = callback; 
+void Window::add_event_listener(WindowEventType event_type, EventCallback callback) {
+  _event_callbacks[event_type] = callback; 
+}
+void Window::handle_event(WindowEventType event_type, const WindowEvent& event) {
+  if(_event_callbacks[event_type]) _event_callbacks[event_type](event);
 }
 void Window::swap_buffers() {
   glfwSwapBuffers(_window);
