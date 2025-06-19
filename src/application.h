@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "window.h"
-#include "types.h"
+#include "renderer.h"
 
 class Application {
 public:
@@ -16,4 +16,5 @@ private:
   bool on_update();
 
   std::unique_ptr<Window> _window;
+  std::unique_ptr<Renderer> _renderer;
 };

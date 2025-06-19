@@ -32,15 +32,19 @@ bool Window::system_start() {
 }
 void Window::system_stop() {
   glfwTerminate();  
+  _is_system_initialized = false;
 }
 bool Window::create(const u32 width, const u32 height, const std::string& title) {
+  // ============== initialization ================  
   if(!is_system_initialized()) {
     LOG_ERR("Window system not initialized");
     return false;
   }
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
   _window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
@@ -50,6 +54,11 @@ bool Window::create(const u32 width, const u32 height, const std::string& title)
   }
   glfwMakeContextCurrent(_window);
   glfwSetWindowUserPointer(_window, this);
+
+  _is_created = true;
+  _width = width;
+  _height = height;
+  // ===============================================  
 
   // ================= CALLBACKS ===================  
   glfwSetWindowCloseCallback(_window, [](GLFWwindow* window){
@@ -61,6 +70,8 @@ bool Window::create(const u32 width, const u32 height, const std::string& title)
   });
   glfwSetWindowSizeCallback(_window, [](GLFWwindow* window, int x, int y){
     Window* this_window = (Window*)glfwGetWindowUserPointer(window);
+    this_window->_width = x;
+    this_window->_height = y;
     WindowResizeEvent event(x, y);
     LOG_EVENT("%s: { %d; %d }", event.get_event_string().c_str(), event.get_x(), event.get_y());
 
@@ -73,12 +84,7 @@ bool Window::create(const u32 width, const u32 height, const std::string& title)
 
     this_window->handle_event(Keyboard, event);
   });
-
   // ===============================================  
-
-  _is_created = true;
-  _width = width;
-  _height = height;
 
   LOG_INIT();
   return true;
@@ -106,4 +112,7 @@ void Window::handle_event(WindowEventType event_type, const WindowEvent& event) 
 }
 void Window::swap_buffers() {
   glfwSwapBuffers(_window);
+}
+void Window::make_current() {
+  glfwMakeContextCurrent(_window);
 }

@@ -2,8 +2,8 @@
 
 // ================ DEFINES ================
 
-#define INIT_LOGGING // Enables logging constructors and init functions stuff
-#define EVENTS_LOGGING
+// #define INIT_LOGGING // Enables logging constructors and init functions stuff
+// #define EVENTS_LOGGING // Enables logging events
 
 #define LOG_INFO(...) Log::info(__VA_ARGS__)
 #define LOG_WARN(...) Log::warn(__VA_ARGS__)

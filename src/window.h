@@ -4,9 +4,6 @@
 #include <array>
 #include <functional>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include "types.h"
 #include "window_event.h"
 
@@ -27,6 +24,7 @@ public:
   bool open(bool fullscreen = false);
   bool close();
   void swap_buffers();
+  void make_current();
 
   void poll_events();
   void add_event_listener(WindowEventType event_type, EventCallback callback);
