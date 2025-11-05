@@ -11,10 +11,11 @@ public:
   ~Application();
 
   bool start();
+  void shutdown();
 private:
   bool init();
   bool on_update();
 
-  std::unique_ptr<Window> _window;
-  std::unique_ptr<Renderer> _renderer;
+  Window _window;
+  Renderer _renderer;
 };

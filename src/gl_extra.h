@@ -6,17 +6,15 @@
 
 #include "types.h"
 
-#define OPENGL_DEBUG
-
-#ifdef OPENGL_DEBUG
+#ifndef NDEBUG
 #define glCall(x) glClearError();\
                   x;\
                   assert(glCheckError());
 #else
 #define glCall(x) x;
-#endif // OPENGL_DEBUG
+#endif // NDEBUG
 
-const char* glGetErrorString(GLenum id) {
+static const char* glGetErrorString(GLenum id) {
   switch (id)
   {
     case GL_INVALID_ENUM:                  return "INVALID_ENUM"; break;
@@ -30,10 +28,10 @@ const char* glGetErrorString(GLenum id) {
 
   return "UNKNOWN_ERROR";
 }
-void glClearError() {
+static void glClearError() {
   while(glGetError() != GL_NO_ERROR);
 }
-bool glCheckError() {
+static bool glCheckError() {
   bool no_error = true;
 
   while(GLenum error = glGetError()) {
