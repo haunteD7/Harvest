@@ -2,7 +2,8 @@
 
 #include "types.h"
 
-class Renderer {
+class Renderer
+{
 public:
   Renderer();
   ~Renderer();
@@ -14,6 +15,7 @@ public:
   void set_clear_color(const float r, const float g, const float b, const float a);
   void clear();
   void set_viewport(const u32 width, const u32 height);
+
 private:
   static bool _is_system_initialized;
 };

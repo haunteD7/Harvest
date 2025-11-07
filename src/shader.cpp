@@ -25,8 +25,10 @@ Shader::Shader(Shader::Type type, const char *source_text) : Shader::Shader(type
     glCall(glShaderSource(_id, 1, &source_text, NULL));
     _state = State::SourceLoaded;
 }
-Shader::~Shader() {
-    if(_program_id_attached_to) { 
+Shader::~Shader()
+{
+    if (_program_id_attached_to)
+    {
         glCall(glDetachShader(_program_id_attached_to, _id));
     }
     glCall(glDeleteShader(_id));
@@ -60,28 +62,36 @@ bool Shader::compile()
 
     return true;
 }
-void Shader::attach_to_program(const ShaderProgram& shader_program) {
+void Shader::attach_to_program(const ShaderProgram &shader_program)
+{
     _program_id_attached_to = shader_program.get_id();
 }
 void Shader::detach_from_program() { _program_id_attached_to = 0; }
-ShaderProgram::ShaderProgram() : _state(State::Created) {
+ShaderProgram::ShaderProgram() : _state(State::Created)
+{
     glCall(_id = glCreateProgram());
 }
-ShaderProgram::~ShaderProgram() {
+ShaderProgram::~ShaderProgram()
+{
     glCall(glDeleteProgram(_id));
 }
 GLuint ShaderProgram::get_id() const { return _id; }
-void ShaderProgram::attach_shader(Shader& shader) {
-    if(shader.get_state() != Shader::State::Compiled) return;
+void ShaderProgram::attach_shader(Shader &shader)
+{
+    if (shader.get_state() != Shader::State::Compiled)
+        return;
     glCall(glAttachShader(_id, shader.get_id()));
     shader.attach_to_program(*this);
 }
-void ShaderProgram::detach_shader(Shader& shader) {
-    if(shader.get_state() != Shader::State::Compiled) return;
+void ShaderProgram::detach_shader(Shader &shader)
+{
+    if (shader.get_state() != Shader::State::Compiled)
+        return;
     glCall(glDetachShader(_id, shader.get_id()));
     shader.detach_from_program();
 }
-bool ShaderProgram::link() { 
+bool ShaderProgram::link()
+{
     glCall(glLinkProgram(_id));
 
     int success;
@@ -100,8 +110,10 @@ bool ShaderProgram::link() {
 
     return true;
 }
-void ShaderProgram::use() {
-    if(_state == State::Linked) {
+void ShaderProgram::use()
+{
+    if (_state == State::Linked)
+    {
         glCall(glUseProgram(_id));
     }
 }

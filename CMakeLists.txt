@@ -9,6 +9,7 @@ file(GLOB_RECURSE SOURCE_FILES
 project(Harvest)
 
 add_executable(Harvest ${SOURCE_FILES})
+target_include_directories(Harvest PRIVATE thirdparty)
 
 add_subdirectory(thirdparty/glfw)
 target_link_libraries(Harvest PRIVATE glfw)

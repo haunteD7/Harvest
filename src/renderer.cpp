@@ -1,3 +1,6 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include "renderer.h"
 #include "log.h"
 #include "shader.h"
@@ -24,27 +27,27 @@ bool Renderer::system_start()
   const char *vertex_shader_src = R"(
     #version 430 core
 
+    layout(location = 0) in vec3 pos;
+    layout(location = 1) in vec2 in_tex_coord;
+
+    out vec2 tex_coord;
+
     void main() {
-      vec2 points[6] = {
-        vec2(-0.5, 0.5),
-        vec2(0.5, 0.5),
-        vec2(0.5, -0.5),
-
-        vec2(-0.5, 0.5),
-        vec2(0.5, -0.5),
-        vec2(-0.5, -0.5),
-      };
-
-      gl_Position = vec4(points[gl_VertexID], 1.0, 1.0);
+      gl_Position = vec4(pos, 1.0);
+      tex_coord = in_tex_coord;
     }
   )";
   const char *fragment_shader_src = R"(
     #version 430 core
 
-    layout (location = 0) out vec4 fragColor;
+    in vec2 tex_coord;
+
+    out vec4 frag_color;
+
+    uniform sampler2D my_texture;
 
     void main() {
-      fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      frag_color = texture(my_texture, tex_coord);
     }
   )";
 
@@ -60,10 +63,49 @@ bool Renderer::system_start()
   }
   prog.use();
 
+  float points[] = {
+    -0.5, 0.5, 0, 0, 1,
+    0.5, 0.5, 0, 1, 1,
+    0.5, -0.5, 0, 1, 0,
+    -0.5, 0.5, 0, 0, 1,
+    0.5, -0.5, 0, 1, 0,
+    -0.5, -0.5, 0, 0, 0,
+  };
+
+  // VBO
+  GLuint VBO;
+  glCall(glGenBuffers(1, &VBO));
+  glCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+  glCall(glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW));
+
   // VAO
   GLuint VAO;
   glCall(glGenVertexArrays(1, &VAO));
   glCall(glBindVertexArray(VAO));
+  glCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(0)));
+  glCall(glEnableVertexAttribArray(0));
+  glCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float))));
+  glCall(glEnableVertexAttribArray(1));
+  
+  int width, height, channels;
+
+  GLuint texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  stbi_set_flip_vertically_on_load(true);
+  unsigned char* image = stbi_load("test.jpg", &width, &height, &channels, 0);
+
+  if(image) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
+
+  stbi_image_free(image);
+
 
   return true;
 }

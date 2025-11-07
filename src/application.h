@@ -5,13 +5,15 @@
 #include "window.h"
 #include "renderer.h"
 
-class Application {
+class Application
+{
 public:
   Application();
   ~Application();
 
   bool start();
   void shutdown();
+
 private:
   bool init();
   bool on_update();
