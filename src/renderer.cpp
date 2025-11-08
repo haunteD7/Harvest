@@ -104,9 +104,14 @@ bool Renderer::system_start()
   stbi_set_flip_vertically_on_load(true);
   unsigned char* image = stbi_load("test.jpg", &width, &height, &channels, 0);
 
-  if(image) {
+  if(image) 
+  {
     glCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image));
     glCall(glGenerateMipmap(GL_TEXTURE_2D));
+  }
+  else
+  {
+    LOG_ERR("Could not load image");
   }
 
   stbi_image_free(image);
@@ -134,7 +139,7 @@ void Renderer::clear()
     0, 0, 1, 0,
     0, 0, 0, 1,
   };
-  glUniformMatrix4fv(mat_loc, 1, GL_FALSE, rotate_mat.raw);
+  glCall(glUniformMatrix4fv(mat_loc, 1, GL_FALSE, rotate_mat.raw));
   glCall(glClear(GL_COLOR_BUFFER_BIT));
   glCall(glDrawArrays(GL_TRIANGLES, 0, 6));
 }
