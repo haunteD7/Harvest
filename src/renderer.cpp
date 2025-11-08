@@ -6,7 +6,10 @@
 #include "shader.h"
 #include "gl_extra.h"
 
+#include "nsmath/mat.h"
+
 bool Renderer::_is_system_initialized;
+static u32 mat_loc;
 
 Renderer::Renderer()
 {
@@ -32,8 +35,10 @@ bool Renderer::system_start()
 
     out vec2 tex_coord;
 
+    uniform mat4 rotate_mat;
+
     void main() {
-      gl_Position = vec4(pos, 1.0);
+      gl_Position = rotate_mat * vec4(pos, 1.0);
       tex_coord = in_tex_coord;
     }
   )";
@@ -90,22 +95,23 @@ bool Renderer::system_start()
   int width, height, channels;
 
   GLuint texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glCall(glGenTextures(1, &texture));
+  glCall(glBindTexture(GL_TEXTURE_2D, texture));
+  glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));	
+  glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+  glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+  glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
   stbi_set_flip_vertically_on_load(true);
   unsigned char* image = stbi_load("test.jpg", &width, &height, &channels, 0);
 
   if(image) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image));
+    glCall(glGenerateMipmap(GL_TEXTURE_2D));
   }
 
   stbi_image_free(image);
 
+  glCall(mat_loc = glGetUniformLocation(prog.get_id(), "rotate_mat"));
 
   return true;
 }
@@ -120,6 +126,15 @@ void Renderer::set_clear_color(const float r, const float g, const float b, cons
 }
 void Renderer::clear()
 {
+  float tm = glfwGetTime();
+  ns::mat4 rotate_mat = 
+  {
+    cos(tm), sin(tm), 0, 0,
+    -sin(tm), cos(tm), 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+  };
+  glUniformMatrix4fv(mat_loc, 1, GL_FALSE, rotate_mat.raw);
   glCall(glClear(GL_COLOR_BUFFER_BIT));
   glCall(glDrawArrays(GL_TRIANGLES, 0, 6));
 }
