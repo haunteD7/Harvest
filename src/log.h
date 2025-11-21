@@ -21,7 +21,7 @@
 #define LOG_EVENT(...) 
 #endif // EVENTS_LOGGING
 
-// ============= LOG FUNCTIONS =============
+// ============= Terminal logging =============
 
 #include <cstdio>
 

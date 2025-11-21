@@ -4,18 +4,37 @@
 
 namespace ns
 {
-  template <typename T>
-  struct vec2_t
+  template <typename T, size_t S>
+  struct vec_t
   {
-    /* Data */
+    T raw[S];
+
+    /* Getters */
+    T &operator[](size_t index)
+    {
+      if(index >= S) throw std::out_of_range("Element index of a vector is out of range");
+      return this->raw[index];
+    }
+    const T &operator[](size_t index) const
+    {
+      if(index >= S) throw std::out_of_range("Element index of a vector is out of range");
+      return this->raw[index];
+    }
+
+  };
+
+  template <typename T>
+  struct vec_t<T, 2> 
+  {
     union
     {
+      T raw[2];
       struct
       {
         T x, y;
       };
-      T raw[2];
     };
+    
     /* Getters */
     T &operator[](size_t index)
     {
@@ -29,11 +48,11 @@ namespace ns
     }
   };
   template <typename T>
-  struct vec3_t
+  struct vec_t<T, 3> 
   {
-    /* Data */
     union
     {
+      T raw[3];
       struct
       {
         T x, y, z;
@@ -42,8 +61,8 @@ namespace ns
       {
         T r, g, b;
       };
-      T raw[3];
     };
+    
     /* Getters */
     T &operator[](size_t index)
     {
@@ -57,11 +76,11 @@ namespace ns
     }
   };
   template <typename T>
-  struct vec4_t
+  struct vec_t<T, 4> 
   {
-    /* Data */
     union
     {
+      T raw[4];
       struct
       {
         T x, y, z, w;
@@ -70,8 +89,8 @@ namespace ns
       {
         T r, g, b, a;
       };
-      T raw[4];
     };
+    
     /* Getters */
     T &operator[](size_t index)
     {
@@ -84,16 +103,15 @@ namespace ns
       return this->raw[index];
     }
   };
+  using vec2 = vec_t<float, 2>;
+  using vec3 = vec_t<float, 3>;
+  using vec4 = vec_t<float, 4>;
 
-  using vec2 = vec2_t<float>;
-  using vec3 = vec3_t<float>;
-  using vec4 = vec4_t<float>;
+  using vec2i = vec_t<int, 2>;
+  using vec3i = vec_t<int, 3>;
+  using vec4i = vec_t<int, 4>;
 
-  using vec2i = vec2_t<int>;
-  using vec3i = vec3_t<int>;
-  using vec4i = vec4_t<int>;
-
-  using vec2ui = vec2_t<unsigned int>;
-  using vec3ui = vec3_t<unsigned int>;
-  using vec4ui = vec4_t<unsigned int>;
+  using vec2ui = vec_t<unsigned int, 2>;
+  using vec3ui = vec_t<unsigned int, 3>;
+  using vec4ui = vec_t<unsigned int, 4>;
 } // namespace ns

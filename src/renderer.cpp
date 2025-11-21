@@ -1,12 +1,12 @@
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
 #include "renderer.h"
 #include "log.h"
 #include "shader.h"
+#include "texture.h"
 #include "gl_extra.h"
 
 #include "nsmath/mat.h"
+
+#include <cmath>
 
 bool Renderer::_is_system_initialized;
 static u32 mat_loc;
@@ -92,29 +92,7 @@ bool Renderer::system_start()
   glCall(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3*sizeof(float))));
   glCall(glEnableVertexAttribArray(1));
   
-  int width, height, channels;
-
-  GLuint texture;
-  glCall(glGenTextures(1, &texture));
-  glCall(glBindTexture(GL_TEXTURE_2D, texture));
-  glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));	
-  glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-  glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
-  glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-  stbi_set_flip_vertically_on_load(true);
-  unsigned char* image = stbi_load("test.jpg", &width, &height, &channels, 0);
-
-  if(image) 
-  {
-    glCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image));
-    glCall(glGenerateMipmap(GL_TEXTURE_2D));
-  }
-  else
-  {
-    LOG_ERR("Could not load image");
-  }
-
-  stbi_image_free(image);
+  auto texture = TextureLoader::load("test.jpg");
 
   glCall(mat_loc = glGetUniformLocation(prog.get_id(), "rotate_mat"));
 
@@ -134,8 +112,8 @@ void Renderer::clear()
   float tm = glfwGetTime();
   ns::mat4 rotate_mat = 
   {
-    cos(tm), sin(tm), 0, 0,
-    -sin(tm), cos(tm), 0, 0,
+    std::cos(tm), std::sin(tm), 0, 0,
+    -std::sin(tm), std::cos(tm), 0, 0,
     0, 0, 1, 0,
     0, 0, 0, 1,
   };
